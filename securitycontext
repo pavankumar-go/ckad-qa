@@ -1,0 +1,35 @@
+1. setup security context at pod level
+-> 
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: nginx
+spec:
+  securityContext:
+    runAsUser: 65534
+    runAsGroup: 65534
+    fsGroup: 2000
+    allowPrivilegeEscalation: false
+  containers:
+  - image: ubuntu
+    name: ubuntu
+    command: ["sleep","3600"]
+
+2. at container level (NOTE: capabilities are supported at container level only)
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: nginx
+spec:
+  containers:
+  - image: ubuntu
+    name: ubuntu
+    command: ["sleep","3600"]
+    securityContext:
+      runAsUser: 65534
+      runAsGroup: 65534
+      fsGroup: 2000
+      allowPrivilegeEscalation: false
+      capabilities:
+        add:
+        - 'SYS_TIME'

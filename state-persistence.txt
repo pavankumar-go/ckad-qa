@@ -1,0 +1,9 @@
+ 1. List Persistent Volumes in the cluster
+ 2. Create a hostPath PersistentVolume named task-pv-volume with storage 10Gi, access modes ReadWriteOnce, storageClassName manual, and volume at /mnt/data and verify
+ 3. Create a PersistentVolumeClaim of at least 3Gi storage and access mode ReadWriteOnce and verify status is Bound
+ 4. Delete persistent volume and PersistentVolumeClaim we just created
+ 5. Create a Pod with an image Redis and configure a volume that lasts for the lifetime of the Pod
+ 6. Exec into the above pod and create a file named file.txt with the text ‘This is called the file’ in the path /data/redis and open another tab and exec again with the same pod and verifies file exist in the same path.
+ 7. Delete the above pod and create again from the same yaml file and verifies there is no file.txt in the path /data/redis
+ 8. Create PersistentVolume named task-pv-volume with storage 10Gi, access modes ReadWriteOnce, storageClassName manual, and volume at /mnt/data and Create a PersistentVolumeClaim of at least 3Gi storage and access mode ReadWriteOnce and verify status is Bound
+ 9. Create an nginx pod with containerPort 80 and with a PersistentVolumeClaim task-pv-claim and has a mouth path "/usr/share/nginx/html"

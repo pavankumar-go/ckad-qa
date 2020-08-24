@@ -1,0 +1,14 @@
+-> openssl genrsa -out new.key 2048
+-> openssl req -in new.key -out new.csr
+-> kubernetes signing request object 
+=========
+apiVersion: certificates.k8s.io/v1beta1
+kind: CertificateSigningRequest
+metadata:
+ name: pavan
+spec:
+  groups:
+  - system:authenticated
+  usages:
+  - client auth
+  request: <base64 encoded new.csr>

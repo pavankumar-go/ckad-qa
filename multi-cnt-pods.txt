@@ -1,0 +1,70 @@
+1. Create a Pod with three busy box containers with commands “ls; sleep 3600;”, “echo Hello World; sleep 3600;” and “echo this is the third container; sleep 3600” respectively and check the status
+->
+=============
+apiVersion: v1
+kind: Pod
+metadata:
+ name: 3-cnt-pod
+spec:
+ containers:
+ - name: pod-1
+   image: busybox
+   command: ["/bin/sh","-c","--"]
+   args: ["ls; sleep 10"]
+ - name: pod-2
+   image: busybox
+   command: ["/bin/sh","-c","--"]
+   args: ["echo hello; sleep 10"]
+ - name: pod-3
+   image: busybox
+   command: ["/bin/sh","-c","--"]
+   args: ["echo 3rd cnt;sleep 10"]
+
+2. Check the logs of each container that you just created
+-> done
+
+3. Check the previous logs of the second container busybox2 if any
+-> done -p
+
+4. Run command ls in the third container busybox3 of the above pod
+-> kubectl exec -it 3-pod -c 3-cnt
+
+5. Show metrics of the above pod containers and puts them into the file.log and verify
+-> kubectl top po 3-cnt-pod > file.log
+
+6. Create a Pod with main container busybox and which executes this 
+   "while true; do echo 'Hi I am from Main container' >> /var/log/index.html; sleep 5; done"
+   and with sidecar container with nginx image which exposes on port 80. 
+   Use emptyDir Volume and mount this volume on path 
+   /var/log for busybox and on path /usr/share/nginx/html for nginx container. 
+   Verify both containers are running
+-> 
+======
+apiVersion: v1
+kind: Pod
+metadata:
+ name: nginx
+ labels:
+   app: my-nginx
+spec:
+ volumes:
+ - name: shared
+   emptyDir: {}
+ containers:
+ - image: busybox
+   name: busybox
+   command: ["/bin/sh", "-c", "--"]
+   args: ["mkdir -p /var/log; touch /var/log/index.html; while true; do echo 'Hi I am from Main container' >> /var/log/index.html; sleep 5; done"]
+   volumeMounts:
+   - name: shared
+     mountPath: "/var/log"
+ - image: nginx
+   name: nginx
+   volumeMounts:
+   - name: shared
+     mountPath: "/usr/share/nginx/html"
+
+
+7. Exec into both containers and verify that 
+   main.txt exist and query the main.txt from sidecar container with curl localhost
+-> done

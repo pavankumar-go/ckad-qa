@@ -1,0 +1,18 @@
+installing Let's Encrypt Certmanager & Ingress 
+-> install cert-manager 
+  1. if problems regarding "tiller"
+    - kubectl create serviceaccount --namespace kube-system tiller
+    - kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+    - kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+    
+  1.  kubectl apply --validate=false -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.13/deploy/manifests/00-crds.yaml
+  2.  helm repo add jetstack/cert-manager
+  3.  helm repo update
+  4.  helm install --name cert-manager --namespace operations jetstack/cert-manager
+  5.  apply cluster issuer from aegis repo.(https://gitlab.digitalapicraft.com/infra/aegis/addons/cert-manager/cluster-issuer)
+  
+-> installing Ingress
+  1. helm repo add nginx-stable https://helm.nginx.com/stable
+  2. helm repo update
+  3. helm install --name nginx-ingress stable/nginx-ingress --set rbac.create=true --set controller.publishService.enabled=true
+

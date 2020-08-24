@@ -1,0 +1,86 @@
+1. Create an nginx pod with a yaml file with label my-nginx and expose the port 80
+-> ```
+  apiVersion: v1
+  kind: Pod
+  metadata:
+   name: nginx
+   labels:
+      app: my-nginx
+  spec:
+   containers:
+   - image: nginx
+     name: nginx
+     ports:
+     - containerPort: 80
+  ```
+2. Create the service for this nginx pod with the pod selector app: my-nginx
+-> apiVersion: v1
+   kind: service
+   metadata: 
+    name: my-service
+   spec:
+    type: ClusterIP
+    ports:
+    - port: 80
+      targetPort: 80
+    selector:
+     app: my-nginx
+
+3. Find out the label of the pod and verify the service has the same label
+-> above answer
+
+4. Delete the service and create the service with kubectl expose command and verify the label
+-> kubectl delete svc previous-created
+-> kubectl expose pod my-nginx --name=my-service
+
+5. Delete the service and create the service again with type NodePort
+-> kubectl expose pod my-nginx --name=nodeport-svc --type=NodePort
+
+6. Create the temporary busybox pod and hit the service. Verify the service that it should return the nginx page index.html
+-> kubectl exec -it nginx sh ; curl IP 
+
+7. Create a NetworkPolicy which denies all ingress traffic
+-> 
+============ Deny ALL
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+============ Deny ALL
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+============== ALLOW ALL Ingress 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+ name: networking
+ namespace:
+spec:
+  podSelector:{}
+  policyTypes:
+  - Ingress
+  ingress:
+  - {}
+=============== ALLOW ALL 
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+ name: 
+ namespace:
+spec:
+  podSelector:{}
+  policyTypes:
+  - Egress
+  egress:
+  - {}
+

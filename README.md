@@ -1,0 +1,1 @@
+# CKAD is a performance-based exam and it’s all about completing 19 questions within 2 hours. We need a lot of practice for it. These 150 questions with solutions give you enough practice for the exam. The more you practice the more comfortable you feel during the exam. Practice. Practice. Practice

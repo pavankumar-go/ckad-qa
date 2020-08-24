@@ -1,0 +1,160 @@
+lets say we have a 3 applications(pod) running 
+1. frontend - 80
+2. backend-API - 8080
+3. database - 3306
+
+flow -> 
+user-> 80-[frontend]-> 8080-[backend-API]-> 3306-[database]
+
+by default every pods can communicate with each-other 
+80-[frontend]-> 8080-[backend-API]-> 3306-[database]
+80-[frontend]-> 8080-[backend-API]
+80-[frontend]-> 3306-[database]
+8080-[backend-API]-> 80-[frontend]
+3306-[database]-> 80-[frontend]
+3306-[database]->8080-[backend-API]
+
+but we do not want every pod to communicate with eachother, hence we some policy to restrict the communication
+Note: "Flannel" Networking solution does not support `NetworkPolicy`
+
+so we want this flow only
+user->(ingress) 80-[frontend](egress)-> (ingress)8080-[backend-API](egress)->(ingress) 3306-[database]
+
+* our db pod
+=======
+metadata:
+  name: db
+  labels:
+    type: db
+-------
+* our backend pod
+=======
+metadata:
+  name: backend
+  labels:
+    type: backend
+-------
+* our frontend pod
+=======
+metadata:
+  name: frontend
+  labels:
+    type: frontend
+-------
+
+=======
+lets apply NetworkPolicy to DB-pod
+=======
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: 
+  name: db-policy
+spec:
+  podSelector:  # we need to select the that we need to apply this policy to
+    matchLabels:
+      type: db  # match the label of db-pod
+  policyTypes:  # types of policy to apply (ingress or egress or both)
+  - Ingress
+  ingress:      # Ingress states that allow incoming requests  
+  - from:       # from pod
+    - podSelector: # selects which pod can communicate with db-pod
+        matchLabels: # match the labels of the pod that needs communication with db-pod
+          type: backend # matches label of backend pod
+    ports: # specify the port of DB pod running on
+      protocol: TCP 
+      port: 3306
+
+takeaway: a pod only with matching label "type: backend" only can communicate with db pod matching "type:db" on port "3306"
+
+
+=======
+lets apply NetworkPolicy to frontend-pod
+=======
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: 
+  name: frontend-policy
+spec:
+  podSelector:  # we need to select the that we need to apply this policy to
+    matchLabels:
+      type: frontend  # match the label of frontend
+  policyTypes:  # types of policy to apply (ingress or egress or both)
+  - Egress
+  egress:      # Egress states that allow outgoing requests  
+  - to:       # to pod
+    - podSelector: # selects which pod can communicate with db-pod
+        matchLabels: # match the labels of the pod that needs communication with db-pod
+          type: backend # matches label of backend pod
+    ports: # specify the port of DB pod running on
+      protocol: TCP 
+      port: 8080
+
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: internal-policy
+spec:
+  podSelector:
+    matchLabels:
+      name: internal  
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - {}
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          name: mysql
+    ports:
+    - protocol: TCP
+      port: 3306
+
+  - to:
+    - podSelector:
+        matchLabels:
+          name: payroll
+    ports:
+    - protocol: TCP
+      port: 8080
+ 
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-log
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 100Mi
+  hostPath:
+    path: /pv/log
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claim-log-1
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Mi
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+  - image: kodekloud/event-simulator
+    name: blah
+    volumeMounts:
+    - mountPath: /log
+      name: hostpathvolume-1
+  volumes:
+  - name: hostpathvolume-1
+    persistentVolumeClaim:
+      claimName: claim-log-1

@@ -1,0 +1,59 @@
+ROLES & ROLEBINDING
+
+-> 
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer
+  namespace: default or any # if not specified default namespace is used
+rules:
+- apiGroups: ""
+  resources: ["pods"]
+  verbs: ["create","get","list","delete","watch" or "*"]
+  resourceNames: ["particular pod name"]
+
+=======
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developer
+  namespace: default or any # if not specified default namespace is used
+subjects:
+- kind: User  
+  name: developer
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+- kind: Role
+  name: developer
+  namespace: default or any # if not specified default namespace is used
+  apiGroup: rbac.authorization.k8s.io
+
+========
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: storage-admin
+rules:
+- apiGroups: 
+  - ""
+  resources: 
+  - persistentvolumes
+  - storageclasses
+  verbs: 
+  - "*"
+
+=========
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: michelle-storage-admin
+subjects:
+- kind: User  
+  name: michelle
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: storage-admin
+  apiGroup: rbac.authorization.k8s.io

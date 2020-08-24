@@ -1,0 +1,66 @@
+    Understand how to use Labels, Selectors and Annotations
+    Understand Deployments and how to perform rolling updates
+    Understand Deployments and how to perform rollbacks
+    Understand Jobs and CronJobs
+
+
+1. Get the pods with label information
+2. Create 5 nginx pods in which two of them is labeled env=prod and three of them is labeled env=dev
+3. Verify all the pods are created with correct labels
+4. Get the pods with label env=dev
+5. Get the pods with label env=dev and also output the labels
+6. Get the pods with label env=prod
+7. Get the pods with label env=prod and also output the labels
+8. Get the pods with label env
+9. Get the pods with labels env=dev and env=prod
+10. Get the pods with labels env=dev and env=prod and output the labels as well
+11. Change the label for one of the pod to env=uat and list all the pods to verify
+12. Remove the labels for the pods that we created now and verify all the labels are removed
+13. Let’s add the label app=nginx for all the pods and verify
+14. Get all the nodes with labels (if using minikube you would get only master node)
+15. Label the node (minikube if you are using) nodeName=nginxnode
+16. Create a Pod that will be deployed on this node with the label nodeName=nginxnode
+17. Verify the pod that it is scheduled with the node selector
+18. Verify the pod nginx that we just created has this label
+19. Annotate the pods with name=webapp
+20. Verify the pods that have been annotated correctly
+21. Remove the annotations on the pods and verify
+22. Remove all the pods that we created so far
+23. Create a deployment called webapp with image nginx with 5 replicas
+24. Get the deployment you just created with labels
+25. Output the yaml file of the deployment you just created
+26. Get the pods of this deployment
+27.  Scale the deployment from 5 replicas to 20 replicas and verify
+28. Get the deployment rollout status
+29. Get the replicaset that created with this deploymen
+30. Get the yaml of the replicaset and pods of this deployment
+31. Delete the deployment you just created and watch all the pods are also being deleted
+32. Create a deployment of webapp with image nginx:1.17.1 with container port 80 and verify the image version
+33. Update the deployment with the image version 1.17.4 and verify
+34. Check the rollout history and make sure everything is ok after the update
+35. Undo the deployment to the previous version 1.17.1 and verify Image has the previous version
+36. Update the deployment with the image version 1.16.1 and verify the image and also check the rollout history
+37. Update the deployment to the Image 1.17.1 and verify everything is ok
+38. Update the deployment with the wrong image version 1.100 and verify something is wrong with the deployment
+39. Undo the deployment with the previous version and verify everything is Ok
+40. Check the history of the specific revision of that deployment
+41. Pause the rollout of the deployment
+42. Update the deployment with the image version latest and check the history and verify nothing is going on
+43. Resume the rollout of the deployment
+44. Check the rollout history and verify it has the new version
+45. Apply the autoscaling to this deployment with minimum 10 and maximum 20 replicas and target CPU of 85% and verify hpa is created and replicas are increased to 10 from 1
+46. Clean the cluster by deleting deployment and hpa you just created
+47. Create a Job with an image node which prints node version and also verifies there is a pod created for this job
+48.  Get the logs of the job just created
+49. Output the yaml file for the Job with the image busybox which echos “Hello I am from job”
+50. Copy the above YAML file to hello-job.yaml file and create the job
+51. Verify the job and the associated pod is created and check the logs as well
+52. Delete the job we just created
+53. Create the same job and make it run 10 times one after one
+54. Watch the job that runs 10 times one by one and verify 10 pods are created and delete those after it’s completed
+55. Create the same job and make it run 10 times parallel
+56. Watch the job that runs 10 times parallelly and verify 10 pods are created and delete those after it’s completed
+57. Create a Cronjob with busybox image that prints date and hello from kubernetes cluster message for every minute
+58. Output the YAML file of the above cronjob
+59. Verify that CronJob creating a separate job and pods for every minute to run and verify the logs of the pod
+60. Delete the CronJob and verify all the associated jobs and pods are also deleted.
